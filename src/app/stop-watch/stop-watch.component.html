@@ -1,7 +1,7 @@
 <div class="watch__container">
     <div class="watch__monitor">
         <div class="watch__numbers" (click)="waitTimer()">
-            {{ time }}
+            {{ time | numToDate }}
         </div>
         <div class="watch__control">
             <button (click)="startTimer()">Start</button>
