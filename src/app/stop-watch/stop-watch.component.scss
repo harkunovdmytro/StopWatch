@@ -1,0 +1,12 @@
+.watch__container {
+    font-size: 40px;
+    display: flex;
+    justify-content: center;
+
+    .watch__monitor {
+        margin: auto;
+        padding: 10px;
+        border: solid 1px darkblue;
+        border-radius: 4px;
+    }
+}
