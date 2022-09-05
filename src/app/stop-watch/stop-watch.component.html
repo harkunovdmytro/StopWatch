@@ -1,6 +1,7 @@
 <div class="watch__container">
     <div class="watch__monitor">
-        <div class="watch__numbers" (click)="waitTimer()">
+        <!-- <div class="watch__numbers" (click)="waitTimer()"> -->
+        <div class="watch__numbers" (click)="obs.next('')">
             {{ time | numToDate }}
         </div>
         <div class="watch__control">

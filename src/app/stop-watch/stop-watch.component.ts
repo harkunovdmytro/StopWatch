@@ -1,27 +1,28 @@
-import { Component } from '@angular/core';
-import { interval, Subject, takeUntil } from "rxjs";
+import { Component, OnInit } from '@angular/core';
+import { interval, Subject, takeUntil, debounceTime, buffer, filter, map } from "rxjs";
 
 @Component({
   selector: 'app-stop-watch',
   templateUrl: './stop-watch.component.html',
   styleUrls: ['./stop-watch.component.scss']
 })
-export class StopWatchComponent {
+export class StopWatchComponent implements OnInit {
   time: number = 0;
-  observer = new Subject();
-  rxjsTimer = interval(1000);
-  isPaused: boolean = false;
-  delay: number = 0;
-  subscription: any;
-  isDoubleClick: boolean = false;
+
+  private observer = new Subject();
+  private rxjsTimer = interval(1000);
+
+  private delay: number = 0;
+  private subscription: any;
+  private isDoubleClick: boolean = false;
+
+  obs = new Subject();
 
   startTimer() {
     this.subscription = this.rxjsTimer.pipe(takeUntil(this.observer))
       .subscribe(
         (counter) => {
           this.time = counter + this.delay;
-          console.log("time: " + this.time)
-          console.log("counter: " + counter)
         })
   }
   stopTimer() {
@@ -30,22 +31,29 @@ export class StopWatchComponent {
     this.delay = 0;
 
   }
-  waitTimer() {
-    if (this.isDoubleClick) {
-      this.delay = this.time;
-      this.stopIteartion();
-      this.isDoubleClick = false;
-    }
-    this.isDoubleClick = true;
-    setTimeout(() => {
-      this.isDoubleClick = false;
-    }, 300);
-  }
 
   stopIteartion() {
     this.observer.next('');
     this.observer.complete();
     this.observer = new Subject();
+  }
+
+  public ngOnInit() {
+    const clickStream = this.obs.asObservable();
+    const dly = 300;
+
+    const multiClickStream = clickStream.pipe(
+      buffer(clickStream.pipe(debounceTime(dly))),
+      map(list => list.length),
+      filter((x) => x >= 2)
+    );
+
+    multiClickStream.subscribe(
+      () => {
+        this.delay = this.time;
+        this.stopIteartion();
+      }
+    )
   }
 }
 
