@@ -14,7 +14,6 @@ export class StopWatchComponent implements OnInit {
 
   private delay: number = 0;
   private subscription: any;
-  private isDoubleClick: boolean = false;
 
   obs = new Subject();
 
@@ -56,22 +55,3 @@ export class StopWatchComponent implements OnInit {
     )
   }
 }
-
-
-// Create a Stopwatch that counts time in HH:MM:SS format.
-
-// Stopwatch should have following buttons:
-// Start/Stop
-// Wait (works on doubleclick, time between clicks should be 300ms or smaller)
-// Reset
-
-// (!) 300 ms - it’s not a doubleclick event
-
-// To pass this task, please use:
-// Angular Material (design is up to you)
-// Observables
-// RxJS
-
-
-
-//

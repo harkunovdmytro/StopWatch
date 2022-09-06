@@ -5,6 +5,10 @@ import { AppComponent } from './app.component';
 import { StopWatchComponent } from './stop-watch/stop-watch.component';
 
 import { NumToDatePipe } from './num-to-date.pipe';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { MatButtonModule } from '@angular/material/button';
+
 
 @NgModule({
   declarations: [
@@ -13,7 +17,9 @@ import { NumToDatePipe } from './num-to-date.pipe';
     NumToDatePipe,
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    BrowserAnimationsModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

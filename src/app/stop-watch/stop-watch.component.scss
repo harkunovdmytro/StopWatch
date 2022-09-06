@@ -5,8 +5,14 @@
 
     .watch__monitor {
         margin: auto;
-        padding: 10px;
+        padding: 18px 14px;
         border: solid 1px darkblue;
         border-radius: 4px;
+    }
+
+    .watch__control {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
     }
 }
