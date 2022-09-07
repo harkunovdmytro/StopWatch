@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { interval, Subject, takeUntil, debounceTime, buffer, filter, map } from "rxjs";
+import { timer, Subject, takeUntil, debounceTime, buffer, filter, map, Observable } from "rxjs";
 
 @Component({
   selector: 'app-stop-watch',
@@ -7,51 +7,73 @@ import { interval, Subject, takeUntil, debounceTime, buffer, filter, map } from 
   styleUrls: ['./stop-watch.component.scss']
 })
 export class StopWatchComponent implements OnInit {
-  time: number = 0;
+  time = 0;
+  dat = new Date();
+
+  isStarted = false;
+  isPaused = false;
 
   private observer = new Subject();
-  private rxjsTimer = interval(1000);
+  private rxjsTimer$ = timer(0, 1000);
 
   private delay: number = 0;
-  private subscription: any;
+  private subscription$!: Observable<number>;
+  private waitTrigger = new Subject();
 
-  obs = new Subject();
+  ngOnInit(): void {
+    this.dat.setHours(0, 0, 0, 0);
+    const clickStream = this.waitTrigger.asObservable();
+    const clickDelay = 300;
 
-  startTimer() {
-    this.subscription = this.rxjsTimer.pipe(takeUntil(this.observer))
-      .subscribe(
-        (counter) => {
-          this.time = counter + this.delay;
-        })
-  }
-  stopTimer() {
-    this.stopIteartion()
-    this.time = 0;
-    this.delay = 0;
-
-  }
-
-  stopIteartion() {
-    this.observer.next('');
-    this.observer.complete();
-    this.observer = new Subject();
-  }
-
-  public ngOnInit() {
-    const clickStream = this.obs.asObservable();
-    const dly = 300;
-
-    const multiClickStream = clickStream.pipe(
-      buffer(clickStream.pipe(debounceTime(dly))),
+    clickStream.pipe(
+      buffer(clickStream.pipe(debounceTime(clickDelay))),
       map(list => list.length),
       filter((x) => x >= 2)
-    );
-
-    multiClickStream.subscribe(
-      () => {
+    ).subscribe(
+      (): void => {
         this.delay = this.time;
         this.stopIteartion();
+        this.setTime(this.delay)
+        this.isPaused = true;
       }
     )
   }
+
+  waitTimer(): void {
+    this.waitTrigger.next('');
+  }
+
+  startTimer(): void {
+    this.isStarted = true;
+    this.isPaused = false;
+
+    this.subscription$ = this.rxjsTimer$.pipe(takeUntil(this.observer))
+    this.subscription$.subscribe(
+      (counter) => {
+        this.time = counter + this.delay;
+        this.setTime(this.time)
+      })
+  }
+  stopTimer(): void {
+    this.isStarted = false;
+    this.isPaused = false;
+
+    this.stopIteartion()
+    this.time = 0;
+    this.delay = 0;
+    this.dat.setHours(0, 0, 0, 0);
+  }
+
+  private stopIteartion(): void {
+    this.observer.next('');
+    this.observer.complete();
+    this.observer = new Subject();
+    this.setTime()
+
+  }
+  private setTime(time: number = 0) {
+    this.dat = new Date()
+    this.dat.setHours(0, 0, time);
+  }
+
 }

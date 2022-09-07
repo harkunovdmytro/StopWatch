@@ -1,11 +1,15 @@
-<div class="watch__container">
-    <div class="watch__monitor">
-        <div class="watch__numbers" (click)="obs.next('')">
-            {{ time | numToDate }}
+<div class="container">
+    <div class="monitor">
+        <div class="numbers" (click)="waitTimer()">
+            {{ dat | date: "HH:mm:ss" }} <br>
         </div>
-        <div class="watch__control">
-            <button mat-raised-button color="primary" (click)="startTimer()">Start</button>
-            <button mat-raised-button color="warn" (click)="stopTimer()">Stop</button>
+        <div class="control">
+            <button [disabled]="isStarted&&!isPaused" mat-raised-button color="primary"
+                (click)="startTimer()">Start</button>
+            <button matTooltip="Double click to pause" [disabled]="!(isStarted&&!isPaused)" mat-raised-button
+                color="accent" (click)="waitTimer()">Wait</button>
+            <button [disabled]="!isStarted&&!isPaused" mat-raised-button color="warn"
+                (click)="stopTimer()">Stop</button>
         </div>
     </div>
 </div>

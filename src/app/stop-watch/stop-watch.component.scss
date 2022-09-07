@@ -1,18 +1,26 @@
-.watch__container {
+.container {
     font-size: 40px;
     display: flex;
     justify-content: center;
 
-    .watch__monitor {
+    .monitor {
         margin: auto;
         padding: 18px 14px;
         border: solid 1px darkblue;
         border-radius: 4px;
     }
 
-    .watch__control {
+    .control {
         margin-top: 20px;
         display: flex;
         justify-content: space-between;
+
+        button:not(:last-child) {
+            margin-right: 10px;
+        }
+    }
+
+    .numbers {
+        text-align: center;
     }
 }
