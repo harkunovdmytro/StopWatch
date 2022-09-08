@@ -1,15 +1,35 @@
 <div class="container">
     <div class="monitor">
-        <div class="numbers" (click)="waitTimer()">
-            {{ dat | date: "HH:mm:ss" }} <br>
+        <div class="numbers">
+            {{ time | numToTime }}
+            <br>
         </div>
         <div class="control">
-            <button [disabled]="isStarted&&!isPaused" mat-raised-button color="primary"
-                (click)="startTimer()">Start</button>
-            <button matTooltip="Double click to pause" [disabled]="!(isStarted&&!isPaused)" mat-raised-button
-                color="accent" (click)="waitTimer()">Wait</button>
-            <button [disabled]="!isStarted&&!isPaused" mat-raised-button color="warn"
-                (click)="stopTimer()">Stop</button>
+            <button
+                mat-raised-button
+                [color]=" isStarted ? 'warn' : 'primary' "
+                (click)="isStarted ? stopTimer() : startTimer() "
+            >
+                {{ isStarted ? 'Stop' : 'Start' }}
+            </button>
+
+            <button
+                mat-raised-button
+                matTooltip="Double click to pause"
+                color="accent"
+                [disabled]="!(isStarted && !isPaused)"
+                (click)="waitTimer()"
+            >
+                Wait
+            </button>
+
+            <button
+                mat-raised-button
+                [disabled]="!isStarted && !isPaused"
+                (click)="resetTimer()"
+            >
+                Reset
+            </button>
         </div>
     </div>
 </div>
