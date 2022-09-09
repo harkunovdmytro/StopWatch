@@ -9,9 +9,7 @@
                 mat-raised-button
                 [color]=" isStarted ? 'warn' : 'primary' "
                 (click)="isStarted ? stopTimer() : startTimer() "
-            >
-                {{ isStarted ? 'Stop' : 'Start' }}
-            </button>
+            >{{ isStarted ? 'Stop' : 'Start' }}</button>
 
             <button
                 mat-raised-button
@@ -19,17 +17,13 @@
                 color="accent"
                 [disabled]="!(isStarted && !isPaused)"
                 (click)="waitTimer()"
-            >
-                Wait
-            </button>
+            >Wait</button>
 
             <button
                 mat-raised-button
                 [disabled]="!isStarted && !isPaused"
                 (click)="resetTimer()"
-            >
-                Reset
-            </button>
+            >Reset</button>
         </div>
     </div>
 </div>
