@@ -12,7 +12,7 @@ export class StopWatchComponent implements OnInit {
   isStarted = false;
   isPaused = false;
 
-  private observer$: Subject<{}> = new Subject();
+  private observer$ = new Subject();
   private rxjsTimer$ = timer(0, 1000);
 
   private delay: number = 0;
@@ -66,9 +66,8 @@ export class StopWatchComponent implements OnInit {
   }
 
   private stopIteartion(): void {
-    this.observer$.next('');
+    this.observer$.next(null);
     this.observer$.complete();
     this.observer$ = new Subject();
   }
-
 }
