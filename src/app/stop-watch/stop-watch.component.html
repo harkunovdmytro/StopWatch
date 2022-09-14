@@ -1,8 +1,7 @@
 <div class="container">
     <div class="monitor">
         <div class="numbers">
-            {{ time | numToTime }}
-            <br>
+            {{ showingTime | date:'HH:mm:ss' }}
         </div>
         <div class="control">
             <button

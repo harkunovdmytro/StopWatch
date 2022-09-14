@@ -7,29 +7,28 @@ import { timer, Subject, takeUntil, debounceTime, buffer, filter, map, Observabl
   styleUrls: ['./stop-watch.component.scss'],
 })
 export class StopWatchComponent implements OnInit {
-  time = 0;
+  showingTime = this.convertNumberToDateString(0);
 
   isStarted = false;
   isPaused = false;
 
-  private observer$ = new Subject();
-  private rxjsTimer$ = timer(0, 1000);
-
+  private time = 0;
   private delay: number = 0;
-  private waitTrigger = new Subject();
+
+  private observer$ = new Subject();
+  private waitTrigger$ = new Subject();
 
   ngOnInit(): void {
-    const clickStream = this.waitTrigger.asObservable();
-    const clickDelay = 300;
+    const clickStream = this.waitTrigger$.asObservable();
 
     clickStream.pipe(
-      buffer(clickStream.pipe(debounceTime(clickDelay))),
+      buffer(clickStream.pipe(debounceTime(300))),
       map(list => list.length),
       filter((x) => x >= 2),
     ).subscribe((): void => {
       this.delay = this.time;
-      this.stopIteartion();
       this.isPaused = true;
+      this.stopIteartion();
     });
   }
 
@@ -38,26 +37,29 @@ export class StopWatchComponent implements OnInit {
   }
 
   waitTimer(): void {
-    this.waitTrigger.next('');
+    this.waitTrigger$.next('');
   }
 
   startTimer(): void {
     this.isStarted = true;
     this.isPaused = false;
 
-    this.rxjsTimer$.pipe(
+    timer(0, 1000).pipe(
       takeUntil(this.observer$),
     ).subscribe((counter) => {
       this.time = counter + this.delay;
+      this.showCurrentTime();
     })
   }
+  
   stopTimer(): void {
     this.isStarted = false;
     this.isPaused = false;
 
-    this.stopIteartion();
     this.time = 0;
     this.delay = 0;
+    this.stopIteartion();
+    this.showCurrentTime();
   }
 
   resetTimer() {
@@ -69,5 +71,13 @@ export class StopWatchComponent implements OnInit {
     this.observer$.next(null);
     this.observer$.complete();
     this.observer$ = new Subject();
+  }
+
+  private convertNumberToDateString(value: number) {
+    return String(new Date(value).setHours(0, 0, value));
+  }
+
+  private showCurrentTime(){
+    this.showingTime = this.convertNumberToDateString(this.time);
   }
 }
