@@ -18,22 +18,22 @@ export class StopWatchComponent implements OnInit {
         clickStream.pipe(
             buffer(clickStream.pipe(debounceTime(300))),
             map(list => list.length),
-            filter((x) => x >= 2),
+            filter((clicksQuantity) => clicksQuantity >= 2),
         ).subscribe((): void => {
             this.onStart$.next(false);
         });
 
         this.onStart$.pipe(
-            filter((v) => v),
+            filter((onStartCurrentValue) => onStartCurrentValue),
             switchMap(
                 () => timer(0, 1000)
                     .pipe(
-                        takeUntil(this.onStart$.pipe(filter((v) => !v)),),
+                        takeUntil(this.onStart$.pipe(filter((onStartCurrentValue) => !onStartCurrentValue)),),
                         withLatestFrom(this.time$),
                         map(([_, time]): number => time + 1)),
             ))
-            .subscribe((time) => {
-                this.time$.next(time);
+            .subscribe((currentStopwatchTime) => {
+                this.time$.next(currentStopwatchTime);
             })
     }
 

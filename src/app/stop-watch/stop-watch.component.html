@@ -1,5 +1,4 @@
 <div class="container">
-    <div>{{time$ | async}}</div>
     <div class="monitor">
         <div class="numbers">
             {{ 1000 * ((time$ | async) || 0) | date: 'HH:mm:ss': 'GMT-0' }}
@@ -23,7 +22,7 @@
                 mat-raised-button
                 matTooltip="Double click to pause"
                 color="accent"
-                [disabled]="!(time$ | async)"
+                [disabled]="!(onStart$ | async)"
                 (click)="waitTimer()"
             >Wait</button>
 
