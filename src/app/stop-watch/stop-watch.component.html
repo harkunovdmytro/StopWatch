@@ -1,26 +1,34 @@
 <div class="container">
     <div class="monitor">
         <div class="numbers">
-            {{ showingTime | date:'HH:mm:ss' }}
-        </div>
+            {{ time$.value * 1000 | date: 'HH:mm:ss': 'GMT-0' }}
+        </div> 
         <div class="control">
             <button
                 mat-raised-button
-                [color]=" isStarted ? 'warn' : 'primary' "
-                (click)="isStarted ? stopTimer() : startTimer() "
-            >{{ isStarted ? 'Stop' : 'Start' }}</button>
+                color="primary"
+                [disabled]="onStart$.value"
+                (click)="startTimer()"
+            >Start</button>
+
+            <button
+                mat-raised-button
+                color="warn"
+                [disabled]="!time$.value"
+                (click)="stopTimer()"
+            >Stop</button>
 
             <button
                 mat-raised-button
                 matTooltip="Double click to pause"
                 color="accent"
-                [disabled]="!isStarted || isPaused"
+                [disabled]="!time$.value"
                 (click)="waitTimer()"
             >Wait</button>
 
             <button
                 mat-raised-button
-                [disabled]="!isStarted && !isPaused"
+                [disabled]="!time$.value"
                 (click)="resetTimer()"
             >Reset</button>
         </div>

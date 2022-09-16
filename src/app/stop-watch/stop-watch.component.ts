@@ -1,83 +1,59 @@
 import { Component, OnInit } from '@angular/core';
-import { timer, Subject, takeUntil, debounceTime, buffer, filter, map, Observable } from "rxjs";
+import { Subject, takeUntil, debounceTime, buffer, filter, map, BehaviorSubject, withLatestFrom, switchMap, timer } from "rxjs";
 
 @Component({
-  selector: 'app-stop-watch',
-  templateUrl: './stop-watch.component.html',
-  styleUrls: ['./stop-watch.component.scss'],
+	selector: 'app-stop-watch',
+	templateUrl: './stop-watch.component.html',
+	styleUrls: ['./stop-watch.component.scss'],
 })
 export class StopWatchComponent implements OnInit {
-  showingTime = this.convertNumberToDateString(0);
+	time$ = new BehaviorSubject<number>(0);
 
-  isStarted = false;
-  isPaused = false;
+	onStart$ = new BehaviorSubject<boolean>(false);
+	onStop$ = new Subject();
+	waitTrigger$ = new BehaviorSubject(false);
 
-  private time = 0;
-  private delay: number = 0;
+	ngOnInit(): void {
+		const clickStream = this.waitTrigger$.asObservable();
 
-  private observer$ = new Subject();
-  private waitTrigger$ = new Subject();
+		clickStream.pipe(
+			buffer(clickStream.pipe(debounceTime(300))),
+			map(list => list.length),
+			filter((x) => x >= 2),
+		).subscribe((): void => {
+			this.onStop$.next('');
+			this.onStart$.next(false);
+		});
+	}
 
-  ngOnInit(): void {
-    const clickStream = this.waitTrigger$.asObservable();
+	waitTimer(): void {
+		this.waitTrigger$.next(false);
+	}
+	
+	startTimer(): void {
+		this.onStart$.next(true);
 
-    clickStream.pipe(
-      buffer(clickStream.pipe(debounceTime(300))),
-      map(list => list.length),
-      filter((x) => x >= 2),
-    ).subscribe((): void => {
-      this.delay = this.time;
-      this.isPaused = true;
-      this.stopIteartion();
-    });
-  }
+		this.onStart$.pipe(
+			switchMap(() => timer(0,1000)),
+			withLatestFrom(this.time$),
+			takeUntil(this.onStop$),
+			map(([_, v]) => v),
+		).subscribe((v) => {
+			console.log(v);
+			this.time$.next(v + 1);
+		});
+	}
 
-  onDestroy() {
-    this.stopIteartion();
-  }
+	stopTimer(): void {
+		this.onStop$.next(true);
+		this.onStop$ = new Subject();
+		this.onStart$.next(false);
 
-  waitTimer(): void {
-    this.waitTrigger$.next('');
-  }
+		this.time$.next(0);
+	}
 
-  startTimer(): void {
-    this.isStarted = true;
-    this.isPaused = false;
-
-    timer(0, 1000).pipe(
-      takeUntil(this.observer$),
-    ).subscribe((counter) => {
-      this.time = counter + this.delay;
-      this.showCurrentTime();
-    })
-  }
-  
-  stopTimer(): void {
-    this.isStarted = false;
-    this.isPaused = false;
-
-    this.time = 0;
-    this.delay = 0;
-    this.stopIteartion();
-    this.showCurrentTime();
-  }
-
-  resetTimer() {
-    this.stopTimer();
-    this.startTimer();
-  }
-
-  private stopIteartion(): void {
-    this.observer$.next(null);
-    this.observer$.complete();
-    this.observer$ = new Subject();
-  }
-
-  private convertNumberToDateString(value: number) {
-    return String(new Date(value).setHours(0, 0, value));
-  }
-
-  private showCurrentTime(){
-    this.showingTime = this.convertNumberToDateString(this.time);
-  }
+	resetTimer() {
+		this.stopTimer();
+		this.startTimer();
+	}
 }
