@@ -18,7 +18,7 @@ export class StopWatchComponent implements OnInit {
         clickStream.pipe(
             buffer(clickStream.pipe(debounceTime(300))),
             map(list => list.length),
-            filter((clicksQuantity) => clicksQuantity >= 2),
+            filter((clicksQuantity) => clicksQuantity === 2),
         ).subscribe((): void => {
             this.onStart$.next(false);
         });
