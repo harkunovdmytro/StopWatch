@@ -1,59 +1,57 @@
 import { Component, OnInit } from '@angular/core';
-import { Subject, takeUntil, debounceTime, buffer, filter, map, BehaviorSubject, withLatestFrom, switchMap, timer } from "rxjs";
+import { Subject, takeUntil, debounceTime, buffer, filter, map, BehaviorSubject, withLatestFrom, switchMap, timer, take, skip } from "rxjs";
 
 @Component({
-	selector: 'app-stop-watch',
-	templateUrl: './stop-watch.component.html',
-	styleUrls: ['./stop-watch.component.scss'],
+    selector: 'app-stop-watch',
+    templateUrl: './stop-watch.component.html',
+    styleUrls: ['./stop-watch.component.scss'],
 })
 export class StopWatchComponent implements OnInit {
-	time$ = new BehaviorSubject<number>(0);
+    time$ = new BehaviorSubject<number>(0);
 
-	onStart$ = new BehaviorSubject<boolean>(false);
-	onStop$ = new Subject();
-	waitTrigger$ = new BehaviorSubject(false);
+    onStart$ = new BehaviorSubject<boolean>(false);
+    waitTrigger$ = new Subject<void>();
 
-	ngOnInit(): void {
-		const clickStream = this.waitTrigger$.asObservable();
+    ngOnInit(): void {
+        const clickStream = this.waitTrigger$.asObservable();
 
-		clickStream.pipe(
-			buffer(clickStream.pipe(debounceTime(300))),
-			map(list => list.length),
-			filter((x) => x >= 2),
-		).subscribe((): void => {
-			this.onStop$.next('');
-			this.onStart$.next(false);
-		});
-	}
+        clickStream.pipe(
+            buffer(clickStream.pipe(debounceTime(300))),
+            map(list => list.length),
+            filter((x) => x >= 2),
+        ).subscribe((): void => {
+            this.onStart$.next(false);
+        });
 
-	waitTimer(): void {
-		this.waitTrigger$.next(false);
-	}
-	
-	startTimer(): void {
-		this.onStart$.next(true);
+        this.onStart$.pipe(
+            filter((v) => v),
+            switchMap(
+                () => timer(0, 1000)
+                    .pipe(
+                        takeUntil(this.onStart$.pipe(filter((v) => !v)),),
+                        withLatestFrom(this.time$),
+                        map(([_, time]): number => time + 1)),
+            ))
+            .subscribe((time) => {
+                this.time$.next(time);
+            })
+    }
 
-		this.onStart$.pipe(
-			switchMap(() => timer(0,1000)),
-			withLatestFrom(this.time$),
-			takeUntil(this.onStop$),
-			map(([_, v]) => v),
-		).subscribe((v) => {
-			console.log(v);
-			this.time$.next(v + 1);
-		});
-	}
+    waitTimer(): void {
+        this.waitTrigger$.next();
+    }
 
-	stopTimer(): void {
-		this.onStop$.next(true);
-		this.onStop$ = new Subject();
-		this.onStart$.next(false);
+    startTimer(): void {
+        this.onStart$.next(true);
+    }
 
-		this.time$.next(0);
-	}
+    stopTimer(): void {
+        this.onStart$.next(false);
+        this.time$.next(0);
+    }
 
-	resetTimer() {
-		this.stopTimer();
-		this.startTimer();
-	}
+    resetTimer(): void {
+        this.stopTimer();
+        this.startTimer();
+    }
 }

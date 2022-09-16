@@ -1,20 +1,21 @@
 <div class="container">
+    <div>{{time$ | async}}</div>
     <div class="monitor">
         <div class="numbers">
-            {{ time$.value * 1000 | date: 'HH:mm:ss': 'GMT-0' }}
+            {{ 1000 * ((time$ | async) || 0) | date: 'HH:mm:ss': 'GMT-0' }}
         </div> 
         <div class="control">
             <button
                 mat-raised-button
                 color="primary"
-                [disabled]="onStart$.value"
+                [disabled]="onStart$ | async"
                 (click)="startTimer()"
             >Start</button>
 
             <button
                 mat-raised-button
                 color="warn"
-                [disabled]="!time$.value"
+                [disabled]="!(time$ | async)"
                 (click)="stopTimer()"
             >Stop</button>
 
@@ -22,13 +23,13 @@
                 mat-raised-button
                 matTooltip="Double click to pause"
                 color="accent"
-                [disabled]="!time$.value"
+                [disabled]="!(time$ | async)"
                 (click)="waitTimer()"
             >Wait</button>
 
             <button
                 mat-raised-button
-                [disabled]="!time$.value"
+                [disabled]="!(time$ | async)"
                 (click)="resetTimer()"
             >Reset</button>
         </div>
