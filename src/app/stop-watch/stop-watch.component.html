@@ -1,0 +1,36 @@
+<div class="container">
+    <div class="monitor">
+        <div class="numbers">
+            {{ 1000 * ((time$ | async) || 0) | date: 'HH:mm:ss': 'GMT-0' }}
+        </div> 
+        <div class="control">
+            <button
+                mat-raised-button
+                color="primary"
+                [disabled]="onStart$ | async"
+                (click)="startTimer()"
+            >Start</button>
+
+            <button
+                mat-raised-button
+                color="warn"
+                [disabled]="!(time$ | async)"
+                (click)="stopTimer()"
+            >Stop</button>
+
+            <button
+                mat-raised-button
+                matTooltip="Double click to pause"
+                color="accent"
+                [disabled]="!(onStart$ | async)"
+                (click)="waitTimer()"
+            >Wait</button>
+
+            <button
+                mat-raised-button
+                [disabled]="!(time$ | async)"
+                (click)="resetTimer()"
+            >Reset</button>
+        </div>
+    </div>
+</div>
